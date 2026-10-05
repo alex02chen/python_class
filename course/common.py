@@ -1,10 +1,18 @@
 """教材撰寫輔助函式。每個單元檔 (u*.py) 定義一個 UNIT dict。"""
 
+from pathlib import Path
 from textwrap import dedent
+
+LESSON_DIR = Path(__file__).resolve().parent / "lessons"
 
 
 def md(text):
     return dedent(text).strip("\n") + "\n"
+
+
+def lesson(name):
+    """讀取 course/lessons/<name>.md 的教材內容。"""
+    return (LESSON_DIR / f"{name}.md").read_text(encoding="utf-8")
 
 
 def code(text):

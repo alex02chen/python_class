@@ -48,7 +48,8 @@ js/app.js           路由與畫面：首頁、單元、問答、練習題、練
 js/runner.js        主執行緒端的執行器：排隊、逾時中止並重建 worker、判題
 js/worker.js        Web Worker：載入 Pyodide、依 import 自動載入套件
 py/harness.py       判題核心（瀏覽器與建置腳本共用同一份）
-course/u*.py        教材、問答、練習題與測資的原始檔（每單元一個檔案）
+course/lessons/*.md 各單元的教材內容（Markdown，```python 區塊會變成可執行範例）
+course/u*.py        問答、練習題與測資的原始檔（每單元一個檔案）
 course/common.py    撰寫教材用的輔助函式
 tools/build.py      建置：產生期望輸出並驗證 → data/course.js
 data/course.js      建置產物（已提交，網站直接載入）
@@ -56,7 +57,7 @@ data/course.js      建置產物（已提交，網站直接載入）
 
 ## 新增或修改題目
 
-教材與題目都寫在 `course/u*.py`，修改後執行：
+教材寫在 `course/lessons/*.md`，問答與題目寫在 `course/u*.py`，修改後執行：
 
 ```bash
 python3 tools/build.py            # 需要 pandas（單元六的題目），pip install pandas
@@ -68,6 +69,8 @@ python3 tools/build.py            # 需要 pandas（單元六的題目），pip 
 2. 若測資有手寫的 `expect=`，與參考解答的輸出交叉比對。
 3. 用隨機產生器跑 30 組資料，確認參考解答不會出錯。
 4. 確認每個 `wrong=`（常見錯誤寫法）至少會在一組測資上失敗——證明測資真的抓得到那個 bug。
+
+5. 教材中每一段 Python 範例都會實際執行一次，不允許出現未預期的錯誤。
 
 任何一項失敗都會中止建置。題目格式範例：
 

@@ -6,6 +6,8 @@
   3. 執行隨機測資產生器 N 次，確認參考解能處理所有隨機資料。
   4. 若題目提供 wrong 解（常見錯誤寫法），確認它至少在一組測資上失敗——證明測資真的抓得到該錯誤。
 
+另外，教材中每一段 ```python 範例都會實際執行一次，不允許出現未捕捉的例外。
+
 用法：python tools/build.py [--random 30]
 """
 
@@ -13,6 +15,7 @@ import argparse
 import importlib.util
 import json
 import multiprocessing as mp
+import re
 import sys
 from pathlib import Path
 
@@ -88,6 +91,20 @@ def build_exercise(ex, n_random, errors):
             errors.append(f"{tag} 測資沒有抓到錯誤解：\n{wrong}")
 
 
+PY_BLOCK = re.compile(r"^```python\n(.*?)^```", re.DOTALL | re.MULTILINE)
+
+
+def check_lesson(unit, errors):
+    """執行教材中的每段範例程式碼，回傳段數。"""
+    blocks = PY_BLOCK.findall(unit["lesson"])
+    for i, src in enumerate(blocks, 1):
+        res = call("run", src, "", "")
+        if "error" in res or not res["ok"]:
+            first = src.strip().splitlines()[0]
+            errors.append(f"[{unit['id']} 教材] 第 {i} 段範例出錯（{first}）：\n{res.get('error') or res['stderr']}")
+    return len(blocks)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--random", type=int, default=30, help="每題用參考解驗證的隨機測資數")
@@ -97,6 +114,8 @@ def main():
     errors = []
     n_ex = n_tests = 0
     for u in units:
+        n_blocks = check_lesson(u, errors)
+        print(f"  ✓ {u['id']:<20} 教材 {n_blocks} 段範例")
         for ex in u["exercises"]:
             build_exercise(ex, args.random, errors)
             n_ex += 1

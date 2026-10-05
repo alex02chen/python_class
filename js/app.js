@@ -221,8 +221,8 @@
   function renderUnit(app, unit, focusQuiz) {
     const prose = el("article", { class: "prose" });
     prose.innerHTML = md(unit.lesson);
+    app.append(prose); // CodeMirror 需要在已顯示的 DOM 中建立才能正確量測尺寸
     $$("pre > code.language-python", prose).forEach((code) => makeRunnable(code.parentElement));
-    app.append(prose);
 
     prose.append(renderQuiz(unit));
 
